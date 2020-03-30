@@ -12,6 +12,8 @@
 
 #import "NudgespotNetworkManager.h"
 
+#import <UserNotifications/UserNotifications.h>
+
 #define Nudge [self sharedInstance]
 
 static Nudgespot *sharedMyManager = nil;
@@ -497,6 +499,36 @@ static Nudgespot *sharedMyManager = nil;
     }
     
     return unregistered;
+}
+
++ (void) instantiateNotificationActions: (NSMutableDictionary *)categoryinfo {
+    NSArray *categories = [categoryinfo objectForKey:@"categories"];
+    NSMutableArray *notificationCateogries = [[NSMutableArray alloc] init];
+    for (id category in categories) {
+        for (id categoryKey in category) {
+            NSMutableDictionary *content = [category objectForKey: categoryKey];
+            NSMutableArray *notificationActions = [[NSMutableArray alloc] init];
+            for (id actionKey in content) {
+                NSMutableDictionary *action = [content objectForKey: actionKey];
+                NSString *actionTitle = [action objectForKey:@"title"];
+                UNNotificationAction* notificationAction = [UNNotificationAction
+                                                            actionWithIdentifier: actionKey
+                                                            title: actionTitle
+                                                            options: UNNotificationActionOptionForeground];
+                [notificationActions addObject: notificationAction];
+            }
+            UNNotificationCategory* notificationCategory = [UNNotificationCategory
+                                                            categoryWithIdentifier: categoryKey
+                                                            actions: notificationActions
+                                                            intentIdentifiers: @[]
+                                                            options: UNNotificationCategoryOptionCustomDismissAction];
+            [notificationCateogries addObject: notificationCategory];
+        }
+    }
+    UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
+    for (id unNotificationCateogry in notificationCateogries) {
+        [center setNotificationCategories:[NSSet setWithObjects: unNotificationCateogry, nil]];
+    }
 }
 
 

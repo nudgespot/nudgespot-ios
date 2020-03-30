@@ -21,27 +21,18 @@ static NSUInteger badgeCount = 1;
     // Override point for customization after application launch.
     // Override point for customization after application launch.
     // Register for remote notifications
-    if (floor(NSFoundationVersionNumber) <= NSFoundationVersionNumber_iOS_7_1) {
-        // iOS 7.1 or earlier
-        UIRemoteNotificationType allNotificationTypes =
-        (UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert | UIRemoteNotificationTypeBadge);
-        [application registerForRemoteNotificationTypes:allNotificationTypes];
-    } else {
-        // iOS 8 or later
-        // [END_EXCLUDE]
         
-        UIUserNotificationType types = (UIUserNotificationTypeAlert|
-                                        UIUserNotificationTypeSound|
-                                        UIUserNotificationTypeBadge);
-        
-        UIUserNotificationSettings *settings;
-        settings = [UIUserNotificationSettings settingsForTypes:types
-                                                     categories:nil];
-        
-        [[UIApplication sharedApplication] registerUserNotificationSettings:settings];
-        
-        [[UIApplication sharedApplication] registerForRemoteNotifications];
-    }
+    UIUserNotificationType types = (UIUserNotificationTypeAlert|
+                                    UIUserNotificationTypeSound|
+                                    UIUserNotificationTypeBadge);
+    
+    UIUserNotificationSettings *settings;
+    settings = [UIUserNotificationSettings settingsForTypes:types
+                                                 categories:nil];
+    
+    [[UIApplication sharedApplication] registerUserNotificationSettings:settings];
+    
+    [[UIApplication sharedApplication] registerForRemoteNotifications];
     // [END register_for_remote_notifications]
     // [START start_Fcm_service]
     
@@ -64,6 +55,28 @@ static NSUInteger badgeCount = 1;
             NSLog(@"%@ is response ", registrationToken);
         }];
     }
+    
+    NSMutableDictionary *notificationCenter = [[NSMutableDictionary alloc] init];
+    NSMutableArray *notificationCategories = [[NSMutableArray alloc] init];
+    
+    NSMutableDictionary *acceptAction = [[NSMutableDictionary alloc] init];
+    [acceptAction setObject:@"accept" forKey:@"title"];
+    
+    NSMutableDictionary *rejectAction = [[NSMutableDictionary alloc] init];
+    [rejectAction setObject:@"reject" forKey:@"title"];
+    
+    NSMutableDictionary *actions = [[NSMutableDictionary alloc] init];
+    [actions setObject:acceptAction forKey:@"accept_action"];
+    [actions setObject:rejectAction forKey:@"reject_action"];
+    
+    NSMutableDictionary *category = [[NSMutableDictionary alloc] init];
+    [category setObject:actions forKey:@"MEETING_INVITATIONS"];
+    
+    [notificationCategories addObject:category];
+    [notificationCenter setObject:notificationCategories forKey:@"categories"];
+    
+    [Nudgespot instantiateNotificationActions:notificationCenter];
+    
     
     return YES;
     

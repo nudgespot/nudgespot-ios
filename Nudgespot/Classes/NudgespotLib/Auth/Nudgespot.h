@@ -16,6 +16,7 @@
 #import "NudgespotActivity.h"
 #import "BasicUtils.h"
 #import "SubscriberClient.h"
+#import <UserNotifications/UserNotifications.h>
 
 @interface Nudgespot : SubscriberClient
 
@@ -186,6 +187,8 @@
  */
 
 + (BOOL) sendUnregistrationToNudgespot:(void (^)(id response, NSError *error))completionBlock;
+
++ (void) instantiateNotificationActions:(NSMutableDictionary *)categoryinfo;
 
 
 + (NSMutableDictionary *)messageObjectToJSON:(NSString *) messageId andMode:(NSString *)mode;
